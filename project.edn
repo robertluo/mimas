@@ -1,0 +1,3 @@
+{:name        mimas
+ :version     "0.1.0"
+ :description "A minimum build script for tools.deps"}

@@ -1,0 +1,8 @@
+{:paths ["src"]
+ :deps
+ {org.clojure/tools.namespace {:mvn/version "0.3.0-alpha4"}
+  eftest                      {:mvn/version "0.5.2"}
+  cloverage                   {:mvn/version "1.0.13"}
+  badigeon                    {:git/url "https://github.com/EwenG/badigeon.git"
+                               :sha     "dca97f9680a6ea204a2504c4414cafc4ba182a83"
+                               :tag     "0.0.6"}}}
