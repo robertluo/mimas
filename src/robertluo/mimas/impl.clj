@@ -19,9 +19,9 @@
   [f]
   (fn [context]
     (let [rst (f context)]
-      (if (nil? rst)
-        context
-        (merge context rst)))))
+      (if (map? rst)
+        (merge context rst)
+        context))))
 
 (defn read-edn
   [filename]
