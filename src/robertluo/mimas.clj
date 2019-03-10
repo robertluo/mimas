@@ -24,7 +24,9 @@
       (->> (map keyword args)
            f)
       (System/exit 0)
-      (catch Exception _
+      (catch Exception e
+        (binding [*out* *err*]
+          (println (.getMessage e)))
         (System/exit 1)))))
 
 (comment
