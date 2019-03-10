@@ -16,6 +16,17 @@
   ([task-map tasknames]
    (impl/build task-map tasknames)))
 
+(defn f->main
+  "Return a main function for build function f"
+  [f]
+  (fn [& args]
+    (try
+      (->> (map keyword args)
+           f)
+      (System/exit 0)
+      (catch Exception _
+        (System/exit 1)))))
+
 (comment
   (build [:project :test])
   )

@@ -23,7 +23,5 @@ Create a file `build.clj` under `dev` directory as your own build script:
 (ns build
   (:require [robertluo.mimas :as mimas]))
 
-(defn -main [& args]
-  (->> (map keyword args)
-       (mimas/build)))
+(def -main (mimas/f->main mimas/build))
 ```
