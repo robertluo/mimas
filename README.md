@@ -21,5 +21,9 @@ Create a file `build.clj` under `dev` directory as your own build script:
 
 ```clojure
 (ns build
-  (:require [robertluo.mimas :refer
+  (:require [robertluo.mimas :as mimas]))
+
+(defn -main [& args]
+  (->> (map keyword args)
+       (mimas/build)))
 ```

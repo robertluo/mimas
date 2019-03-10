@@ -23,16 +23,19 @@
         context
         (merge context rst)))))
 
+(defn read-edn
+  [filename]
+  (try
+    (some-> (slurp filename) (clojure.edn/read-string))
+    (catch java.io.IOException _ nil)))
+
 (defn project
   "read project's meta information into context"
   ([context]
    (project "project.edn" context))
   ([project-file context]
-   (let [meta (try
-                (some-> (slurp project-file) (clojure.edn/read-string))
-                (catch java.io.IOException _ nil))]
-     (when meta
-       {:project/meta meta}))))
+   (when-let [meta (read-edn project-file)]
+     {:project/meta meta})))
 
 (defn test
   "Run tests of project using eftest"
@@ -56,4 +59,4 @@
    (->> tasknames
         (map tasks)
         (map context-return)
-        (reduce #(%2 %) {}))))
+        (reduce #(%2 %) (read-edn "deps.edn")))))
