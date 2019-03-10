@@ -1,0 +1,21 @@
+(ns robertluo.mimas
+  "A minimum build library"
+  (:require
+   [clojure.tools.namespace.repl :refer [refresh]]
+   [robertluo.mimas.impl :as impl]))
+
+(def builtin-tasks
+  {:project  #'impl/project
+   :test     #'impl/test
+   :coverage #'impl/coverage})
+
+(defn build
+  "Run build tasknames (keywords) on task-map, default to builtin-tasks"
+  ([tasknames]
+   (build builtin-tasks tasknames))
+  ([task-map tasknames]
+   (impl/build task-map tasknames)))
+
+(comment
+  (build [:project :test])
+  )
