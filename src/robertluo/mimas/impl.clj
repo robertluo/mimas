@@ -6,12 +6,13 @@
   a task will be called with a context."
   (:refer-clojure :exclude [test])
   (:require
+   [robertluo.mimas.impl.javac :as javac]
+   [clojure.tools.deps.alpha :as deps]
    [eftest.runner :refer [run-tests find-tests]]
    [cloverage.coverage :as cov]
    [badigeon.clean :as clean]
    [badigeon.bundle :as bundle]
    [badigeon.jar :as jar]
-   [clojure.tools.deps.alpha.reader :as deps]
    [clojure.string :as str]))
 
 (defn context-return
@@ -54,9 +55,28 @@
            "-s" "test"
            (interleave (repeat "-p") paths))))
 
+(defn class-path
+  [context]
+  (-> context
+      (update :mvn/repos merge clojure.tools.deps.alpha.util.maven/standard-repos)
+      (deps/resolve-deps {:verbose true})
+      (deps/make-classpath nil nil)))
+
+(defn javac
+  "Compile java source files"
+  [{:javac/keys [source-paths classes-path opts] :as context
+    :or {source-paths ["src/main/java" "src/java"]
+         classes-path "target/classes"}}]
+  (let [cmd (javac/command-line (class-path context) classes-path source-paths opts)]
+    (javac/run-compile cmd)))
+
 (defn build
   ([tasks tasknames]
    (->> tasknames
         (map tasks)
         (map context-return)
         (reduce #(%2 %) (read-edn "deps.edn")))))
+
+(comment
+  (class-path (read-edn "deps.edn"))
+  )

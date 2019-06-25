@@ -7,6 +7,7 @@
 (def builtin-tasks
   {:project  #'impl/project
    :test     #'impl/test
+   :javac    #'impl/javac
    :coverage #'impl/coverage})
 
 (defn build
@@ -29,6 +30,9 @@
           (println (.getMessage e)))
         (System/exit 1)))))
 
+(def -main (f->main build))
+
 (comment
   (build [:project :test])
+  (build [:project :javac])
   )
