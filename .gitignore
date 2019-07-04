@@ -6,7 +6,6 @@ pom.xml
 *.iml
 .idea/
 .m2/
-web/resources/public/scripts/prop/*
-web/resources/public/scripts/prop.js
 *.log
 .floo*
+*.class

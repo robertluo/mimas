@@ -76,15 +76,15 @@
             cu                       (.getJavaFileObjectsFromStrings file-mng source-file-names)
             task                     (.getTask compiler nil file-mng dcc options nil cu)
             rst                      (.call task)]
-        #:javac{:result         rst
-                :file-report    (diagnostics dc)
-                :compile-report (diagnostics dcc)}))))
+        (-> {:javac/result rst}
+            (assoc-if :javac/file-report (diagnostics dc))
+            (assoc-if :javac/compile-report (diagnostics dcc)))))))
 
 (s/def ::javac/result boolean?)
 (s/def ::result (s/keys :opt [::javac/result]))
 
-(s/fdef run-compile
-  :args (s/cat :command-line ::command-line)
+(s/fdef run!
+  :args (s/cat :file-names (s/coll-of string?) :command-line (s/nilable ::command-line))
   :ret ::result)
 
 (comment
