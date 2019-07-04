@@ -1,10 +1,12 @@
 (ns robertluo.mimas.impl.javac
+  (:refer-clojure :exclude [run!])
   (:require
    [clojure.java.io :as io]
    [clojure.spec.alpha :as s]
    [badigeon.javac :as javac])
   (:import
-   [javax.tools ToolProvider]
+   [javax.tools ToolProvider DiagnosticCollector JavaCompiler StandardJavaFileManager
+    Diagnostic$Kind Diagnostic]
    [java.io ByteArrayOutputStream]))
 
 (defn source-file?
@@ -29,9 +31,8 @@
 
 (defn command-line
   "return jdk command line without command itself"
-  [class-path target-path filenames opts]
-  (->> (map str filenames)
-       (into `[~@(when class-path ["-cp" class-path]) ~@opts "-d" ~target-path])))
+  [class-path target-path opts]
+  `[~@(when class-path ["-cp" class-path]) ~@opts "-d" ~target-path])
 
 (defn assoc-if
   "assoc k, v to map m if (pred v) is true, else return m"
@@ -42,21 +43,45 @@
      (assoc m k v)
      m)))
 
-(defn run-compile
-  "call java compiler with command-line"
-  [command-line]
-  (let [compiler (ToolProvider/getSystemJavaCompiler)
-        empty-out #(ByteArrayOutputStream.)
-        out (empty-out)
-        err (empty-out)]
-    (.run compiler nil out err (into-array String command-line))
-    (-> nil
-        (assoc-if :javac/out (str out))
-        (assoc-if :javac/err (str err)))))
+(defn diagnostics
+  "return diagnostics map of dc"
+  [^DiagnosticCollector dc]
+  (for [^Diagnostic diags (.getDiagnostics dc)]
+    {:code          (.getCode diags)
+     :column-number (.getColumnNumber diags)
+     :line-number   (.getLineNumber diags)
+     :source        (.getSource diags)
+     :start-pos     (.getStartPosition diags)
+     :position      (.getPosition diags)
+     :message       (.getMessage diags (java.util.Locale/getDefault))
+     :kind          (condp = (.getKind diags)
+                      Diagnostic$Kind/ERROR             :error
+                      Diagnostic$Kind/WARNING           :warning
+                      Diagnostic$Kind/NOTE              :note
+                      Diagnostic$Kind/OTHER             :other
+                      Diagnostic$Kind/MANDATORY_WARNING :mandatory-warning
+                      :other)}))
 
-(s/def ::javac/out string?)
-(s/def ::javac/err string?)
-(s/def ::result (s/keys :opt [::javac/out ::javac/err]))
+(s/def ::code string?)
+(s/def ::report
+  (s/keys :opt-un [::code]))
+
+(defn run!
+  "call java compiler with source file names and javac options"
+  [source-file-names options]
+  (let [^JavaCompiler compiler  (ToolProvider/getSystemJavaCompiler)
+        ^DiagnosticCollector dc (DiagnosticCollector.)]
+    (with-open [^StandardJavaFileManager file-mng (.getStandardFileManager compiler dc nil nil)]
+      (let [^DiagnosticCollector dcc (DiagnosticCollector.)
+            cu                       (.getJavaFileObjectsFromStrings file-mng source-file-names)
+            task                     (.getTask compiler nil file-mng dcc options nil cu)
+            rst                      (.call task)]
+        #:javac{:result         rst
+                :file-report    (diagnostics dc)
+                :compile-report (diagnostics dcc)}))))
+
+(s/def ::javac/result boolean?)
+(s/def ::result (s/keys :opt [::javac/result]))
 
 (s/fdef run-compile
   :args (s/cat :command-line ::command-line)
@@ -65,6 +90,5 @@
 (comment
   (require '[clojure.spec.test.alpha :as stest])
   (stest/instrument)
-  (-> (command "lib" "/tmp" (source-filenames ["/tmp"]) nil)
-      (run-compile))
+  (run! (source-filenames ["sample/src/java"]) (command-line nil "/tmp" nil))
   )
