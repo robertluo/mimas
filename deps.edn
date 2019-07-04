@@ -10,4 +10,8 @@
   badigeon/badigeon
   {:git/url "https://github.com/EwenG/badigeon.git",
    :tag     "0.0.7",
-   :sha     "6fc7f26fcb4fa90b19dfb86a422756e23af5b536"}}}
+   :sha     "6fc7f26fcb4fa90b19dfb86a422756e23af5b536"}}
+ :aliases
+ {:dev
+  {:extra-paths ["test"]
+   :main-opts ["-m" "robertluo.mimas"]}}}
