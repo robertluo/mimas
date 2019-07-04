@@ -65,10 +65,11 @@
 (defn javac
   "Compile java source files"
   [{:javac/keys [source-paths classes-path opts] :as context
-    :or {source-paths ["src/main/java" "src/java"]
-         classes-path "target/classes"}}]
-  (let [cmd (javac/command-line (class-path context) classes-path source-paths opts)]
-    (javac/run-compile cmd)))
+    :or         {source-paths ["src/main/java" "src/java"]
+                 classes-path "target/classes"}}]
+  (let [cmd          (javac/command-line (class-path context) classes-path opts)
+        source-files (javac/source-filenames source-paths)]
+    (javac/run! source-files cmd)))
 
 (defn build
   ([tasks tasknames]
