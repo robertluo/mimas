@@ -14,4 +14,7 @@
  :aliases
  {:dev
   {:extra-paths ["test"]
-   :main-opts ["-m" "robertluo.mimas"]}}}
+   :main-opts ["-m" "robertluo.mimas"]}
+  :test
+  {:extra-deps {lambdaisland/kaocha {:mvn/version "0.0-529"}}
+   :main-opts ["-m" "kaocha.runner"]}}}

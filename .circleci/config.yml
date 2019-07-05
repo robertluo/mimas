@@ -27,4 +27,4 @@ jobs:
           key: v1-dependencies-{{ checksum "deps.edn" }}
 
       # run tests!
-      - run: clojure -A:dev project test
+      - run: clojure -A:test
