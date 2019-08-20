@@ -15,8 +15,9 @@ Insert these into your `deps.edn`:
  {:dev
   {:extra-paths ["dev" "test"]
    :extra-deps
-   {:git/url "https://github.com/robertluo/mimas"
-    :sha "$RELEASE-SHA-COPY-FROM-UI"}}}}
+   {robertluo/mimas
+    {:git/url "https://github.com/robertluo/mimas"
+     :sha "$RELEASE-SHA-COPY-FROM-UI"}}}}}
 ```
 
 Create a file `build.clj` under `dev` directory as your own build script:
