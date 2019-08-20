@@ -9,11 +9,7 @@
    [robertluo.mimas.impl.javac :as javac]
    [clojure.tools.deps.alpha :as deps]
    [eftest.runner :refer [run-tests find-tests]]
-   [cloverage.coverage :as cov]
-   [badigeon.clean :as clean]
-   [badigeon.bundle :as bundle]
-   [badigeon.jar :as jar]
-   [clojure.string :as str]))
+   [cloverage.coverage :as cov]))
 
 (defn context-return
   "Turn function f into context returning function"
@@ -34,13 +30,13 @@
   "read project's meta information into context"
   ([context]
    (project "project.edn" context))
-  ([project-file context]
+  ([project-file _]
    (when-let [meta (read-edn project-file)]
      {:project/meta meta})))
 
 (defn test
   "Run tests of project using eftest"
-  [{:test/keys [dir multithread?] :or {dir "test" multithread? false} :as context}]
+  [{:test/keys [dir multithread?] :or {dir "test" multithread? false}}]
   (let [summary (run-tests (find-tests dir) {:multithread? multithread?})]
     (when-not (zero? (+ (:fail summary) (:error summary)))
       (throw (ex-info "Tests failed" {:reason summary})))
@@ -48,7 +44,7 @@
 
 (defn coverage
   "Run test coverage using cloverage"
-  [{:keys [paths] :as context}]
+  [{:keys [paths]}]
   (binding [cov/*exit-after-test* false]
     (apply cov/-main
            "-e" ""
@@ -68,8 +64,11 @@
     :or         {source-paths ["src/main/java" "src/java"]
                  classes-path "target/classes"}}]
   (let [cmd          (javac/command-line (class-path context) classes-path opts)
-        source-files (javac/source-filenames source-paths)]
-    (javac/run! source-files cmd)))
+        source-files (javac/source-filenames source-paths)
+        compile-rslt (javac/run! source-files cmd)]
+    (if (:javac/result compile-rslt)
+      (assoc compile-rslt :javac/target class-path)
+      (throw (ex-info "Javac failed" compile-rslt)))))
 
 (defn build
   ([tasks tasknames]
