@@ -1,12 +1,12 @@
 (ns robertluo.mimas
   "A minimum build library"
   (:require
-   [clojure.tools.namespace.repl :refer [refresh]]
-   [robertluo.mimas.impl :as impl]))
+   [robertluo.mimas.impl :as impl]
+   [robertluo.mimas.test :as test]))
 
 (def builtin-tasks
   {:project  #'impl/project
-   :test     #'impl/test
+   :test     #'test/task
    :javac    #'impl/javac
    :coverage #'impl/coverage})
 

@@ -4,11 +4,9 @@
   Cores concept here is task and building context.
   building context is map contains all information a task need to know,
   a task will be called with a context."
-  (:refer-clojure :exclude [test])
   (:require
    [robertluo.mimas.impl.javac :as javac]
    [clojure.tools.deps.alpha :as deps]
-   [eftest.runner :refer [run-tests find-tests]]
    [cloverage.coverage :as cov]))
 
 (defn context-return
@@ -34,13 +32,7 @@
    (when-let [meta (read-edn project-file)]
      {:project/meta meta})))
 
-(defn test
-  "Run tests of project using eftest"
-  [{:test/keys [dir multithread?] :or {dir "test" multithread? false}}]
-  (let [summary (run-tests (find-tests dir) {:multithread? multithread?})]
-    (when-not (zero? (+ (:fail summary) (:error summary)))
-      (throw (ex-info "Tests failed" {:reason summary})))
-    {:test/summary summary}))
+
 
 (defn coverage
   "Run test coverage using cloverage"
