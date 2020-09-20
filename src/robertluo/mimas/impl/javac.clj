@@ -3,15 +3,15 @@
   (:require
    [clojure.java.io :as io]
    [clojure.spec.alpha :as s]
+   [clojure.string :as string]
    [badigeon.javac :as javac])
   (:import
    [javax.tools ToolProvider DiagnosticCollector JavaCompiler StandardJavaFileManager
-    Diagnostic$Kind Diagnostic]
-   [java.io ByteArrayOutputStream]))
+    Diagnostic$Kind Diagnostic]))
 
 (defn source-file?
   [s]
-  (clojure.string/ends-with? s ".java"))
+  (string/ends-with? s ".java"))
 
 (defn source-filenames
   "return source file names with paths"

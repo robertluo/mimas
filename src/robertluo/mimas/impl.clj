@@ -4,12 +4,11 @@
   Cores concept here is task and building context.
   building context is map contains all information a task need to know,
   a task will be called with a context."
-  (:refer-clojure :exclude [test])
   (:require
    [robertluo.mimas.impl.javac :as javac]
    [clojure.tools.deps.alpha :as deps]
-   [eftest.runner :refer [run-tests find-tests]]
-   [cloverage.coverage :as cov]))
+   [clojure.edn :as edn]
+   [clojure.tools.deps.alpha.util.maven :as maven]))
 
 (defn context-return
   "Turn function f into context returning function"
@@ -23,7 +22,7 @@
 (defn read-edn
   [filename]
   (try
-    (some-> (slurp filename) (clojure.edn/read-string))
+    (some-> (slurp filename) (edn/read-string))
     (catch java.io.IOException _ nil)))
 
 (defn project
@@ -34,27 +33,10 @@
    (when-let [meta (read-edn project-file)]
      {:project/meta meta})))
 
-(defn test
-  "Run tests of project using eftest"
-  [{:test/keys [dir multithread?] :or {dir "test" multithread? false}}]
-  (let [summary (run-tests (find-tests dir) {:multithread? multithread?})]
-    (when-not (zero? (+ (:fail summary) (:error summary)))
-      (throw (ex-info "Tests failed" {:reason summary})))
-    {:test/summary summary}))
-
-(defn coverage
-  "Run test coverage using cloverage"
-  [{:keys [paths]}]
-  (binding [cov/*exit-after-test* false]
-    (apply cov/-main
-           "-e" ""
-           "-s" "test"
-           (interleave (repeat "-p") paths))))
-
 (defn class-path
   [context]
   (-> context
-      (update :mvn/repos merge clojure.tools.deps.alpha.util.maven/standard-repos)
+      (update :mvn/repos merge maven/standard-repos)
       (deps/resolve-deps {:verbose true})
       (deps/make-classpath nil nil)))
 
