@@ -7,7 +7,9 @@
   (:require
    [robertluo.mimas.impl.javac :as javac]
    [clojure.tools.deps.alpha :as deps]
-   [cloverage.coverage :as cov]))
+   [cloverage.coverage :as cov]
+   [clojure.edn :as edn]
+   [clojure.tools.deps.alpha.util.maven :as maven]))
 
 (defn context-return
   "Turn function f into context returning function"
@@ -21,7 +23,7 @@
 (defn read-edn
   [filename]
   (try
-    (some-> (slurp filename) (clojure.edn/read-string))
+    (some-> (slurp filename) (edn/read-string))
     (catch java.io.IOException _ nil)))
 
 (defn project
@@ -31,8 +33,6 @@
   ([project-file _]
    (when-let [meta (read-edn project-file)]
      {:project/meta meta})))
-
-
 
 (defn coverage
   "Run test coverage using cloverage"
@@ -46,7 +46,7 @@
 (defn class-path
   [context]
   (-> context
-      (update :mvn/repos merge clojure.tools.deps.alpha.util.maven/standard-repos)
+      (update :mvn/repos merge maven/standard-repos)
       (deps/resolve-deps {:verbose true})
       (deps/make-classpath nil nil)))
 
