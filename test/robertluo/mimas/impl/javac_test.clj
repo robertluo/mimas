@@ -1,6 +1,6 @@
 (ns robertluo.mimas.impl.javac-test
   (:require [robertluo.mimas.impl.javac :as sut]
-            [clojure.test :refer :all]
+            [clojure.test :refer [deftest use-fixtures is testing]]
             [clojure.spec.test.alpha :as stest]))
 
 (use-fixtures :once (fn [f] (stest/instrument) (f) (stest/unstrument)))
