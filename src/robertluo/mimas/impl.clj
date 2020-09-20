@@ -7,7 +7,6 @@
   (:require
    [robertluo.mimas.impl.javac :as javac]
    [clojure.tools.deps.alpha :as deps]
-   [cloverage.coverage :as cov]
    [clojure.edn :as edn]
    [clojure.tools.deps.alpha.util.maven :as maven]))
 
@@ -33,15 +32,6 @@
   ([project-file _]
    (when-let [meta (read-edn project-file)]
      {:project/meta meta})))
-
-(defn coverage
-  "Run test coverage using cloverage"
-  [{:keys [paths]}]
-  (binding [cov/*exit-after-test* false]
-    (apply cov/-main
-           "-e" ""
-           "-s" "test"
-           (interleave (repeat "-p") paths))))
 
 (defn class-path
   [context]

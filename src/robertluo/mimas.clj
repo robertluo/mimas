@@ -8,7 +8,7 @@
   {:project  #'impl/project
    :test     #'test/task
    :javac    #'impl/javac
-   :coverage #'impl/coverage})
+   :coverage #'test/coverage})
 
 (defn build
   "Run build tasknames (keywords) on task-map, default to builtin-tasks"

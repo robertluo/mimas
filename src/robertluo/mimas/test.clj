@@ -1,6 +1,17 @@
 (ns robertluo.mimas.test
   "Test task"
-  (:require [eftest.runner :refer [run-tests find-tests]]))
+  (:require
+   [eftest.runner :refer [run-tests find-tests]]
+   [cloverage.coverage :as cov]))
+
+(defn coverage
+  "Run test coverage using cloverage"
+  [{:keys [paths]}]
+  (binding [cov/*exit-after-test* false]
+    (apply cov/-main
+           "-e" ""
+           "-s" "test"
+           (interleave (repeat "-p") paths))))
 
 (defn task
   "Run tests of project using eftest"
